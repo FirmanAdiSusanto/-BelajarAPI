@@ -89,3 +89,24 @@ func (um *UserModel) AddActivity(hp string, activity Activity) error {
 
 	return nil
 }
+
+// UpdateActivity memperbarui kegiatan untuk pengguna yang diidentifikasi oleh hp dan ID kegiatan.
+func (um *UserModel) UpdateActivity(hp string, id string, activity Activity) error {
+	// Perbarui kegiatan hanya jika milik pengguna saat ini (hp)
+	if err := um.Connection.Where("user_id = ? AND id = ?", hp, id).Updates(&activity).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetActivities mengembalikan daftar kegiatan untuk pengguna yang diidentifikasi oleh hp.
+func (um *UserModel) GetActivities(hp string) ([]Activity, error) {
+	var activities []Activity
+	// Dapatkan daftar kegiatan untuk pengguna saat ini (hp)
+	if err := um.Connection.Where("user_id = ?", hp).Find(&activities).Error; err != nil {
+		return nil, err
+	}
+
+	return activities, nil
+}

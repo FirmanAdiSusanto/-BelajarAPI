@@ -211,3 +211,52 @@ func (us *UserController) AddActivity() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "Berhasil Ditambahkan", nil))
 	}
 }
+
+func (us *UserController) UpdateActivity() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// Mengambil token JWT dari konteks
+		token := c.Get("user").(*jwt.Token)
+
+		// Mengambil claims dari token JWT
+		claims := token.Claims.(jwt.MapClaims)
+
+		// Mengambil nomor HP dari claims
+		hp := claims["hp"].(string)
+
+		// Mendapatkan ID kegiatan dari parameter URL
+		id := c.Param("id")
+
+		var updatedActivity model.Activity
+		if err := c.Bind(&updatedActivity); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFormat(http.StatusBadRequest, "Gagal memproses permintaan", nil))
+		}
+
+		// Update the activity only if it belongs to the current user (hp)
+		if err := us.Model.UpdateActivity(hp, id, updatedActivity); err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Gagal mengupdate kegiatan", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Kegiatan berhasil diupdate", nil))
+	}
+}
+
+func (us *UserController) GetActivities() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// Mengambil token JWT dari konteks
+		token := c.Get("user").(*jwt.Token)
+
+		// Mengambil claims dari token JWT
+		claims := token.Claims.(jwt.MapClaims)
+
+		// Mengambil nomor HP dari claims
+		hp := claims["hp"].(string)
+
+		// Get activities for the current user (hp)
+		activities, err := us.Model.GetActivities(hp)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, "Gagal mendapatkan kegiatan", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseFormat(http.StatusOK, "Berhasil mendapatkan kegiatan", activities))
+	}
+}
