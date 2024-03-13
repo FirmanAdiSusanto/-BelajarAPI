@@ -1,10 +1,14 @@
 package main
 
 import (
-	"BelajarAPIi/config"
-	"BelajarAPIi/controller/user"
-	"BelajarAPIi/model"
-	"BelajarAPIi/routes"
+	"clean1/config"
+	td "clean1/features/todo/data"
+	th "clean1/features/todo/handler"
+	ts "clean1/features/todo/services"
+	"clean1/features/user/data"
+	"clean1/features/user/handler"
+	"clean1/features/user/services"
+	"clean1/routes"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,11 +19,17 @@ func main() {
 	cfg := config.InitConfig() // baca seluruh system variable
 	db := config.InitSQL(cfg)  // konek DB
 
-	m := model.UserModel{Connection: db} // bagian yang menghungkan coding kita ke database / bagian dimana kita ngoding untk ke DB
-	c := user.UserController{Model: m}   // bagian yang menghandle segala hal yang berurusan dengan HTTP / echo
+	userData := data.New(db)
+	userService := services.NewService(userData)
+	userHandler := handler.NewUserHandler(userService)
+
+	todoData := td.New(db)
+	todoService := ts.NewTodoService(todoData)
+	todoHandler := th.NewHandler(todoService)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS()) // ini aja cukup
-	routes.InitRoute(e, c)
-	e.Logger.Fatal(e.Start(":8000"))
+	routes.InitRoute(e, userHandler, todoHandler)
+	e.Logger.Fatal(e.Start(":8080"))
 }

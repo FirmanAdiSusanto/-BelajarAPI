@@ -1,35 +1,29 @@
 package routes
 
 import (
-	"BelajarAPIi/config"
-	"BelajarAPIi/controller/user"
+	"clean1/config"
+	todo "clean1/features/todo"
+	user "clean1/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
-func InitRoute(c *echo.Echo, ctl user.UserController) {
-	c.POST("/users", ctl.Register()) // register -> umum (boleh diakses semua orang)
+func InitRoute(c *echo.Echo, ctl user.UserController, tc todo.TodoController) {
+	userRoute(c, ctl)
+	todoRoute(c, tc)
+}
+
+func userRoute(c *echo.Echo, ctl user.UserController) {
+	c.POST("/users", ctl.Add())
 	c.POST("/login", ctl.Login())
-	c.GET("/users", ctl.ListUser(), echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(config.JWTSECRET),
-	})) // get all user -> butuh penanda khusus
-	c.GET("/users/:hp", ctl.Profile(), echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(config.JWTSECRET),
-	})) // get profile -> butuh penanda khusus
-	c.PUT("/users/:hp", ctl.Update(), echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(config.JWTSECRET),
-	})) // update user -> butuh penanda khusus
-	//Menambah Kegiatan
-	c.POST("/kegiatan", ctl.AddActivity(), echojwt.WithConfig(echojwt.Config{
+	c.GET("/profile", ctl.Profile(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
-	// Rute untuk memperbarui kegiatan
-	c.PUT("/kegiatan/:id", ctl.UpdateActivity(), echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(config.JWTSECRET),
-	}))
-	// Rute untuk mendapatkan daftar kegiatan pengguna
-	c.GET("/kegiatan", ctl.GetActivities(), echojwt.WithConfig(echojwt.Config{
+}
+
+func todoRoute(c *echo.Echo, tc todo.TodoController) {
+	c.POST("/todos", tc.Add(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
 }

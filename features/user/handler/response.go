@@ -1,4 +1,4 @@
-package user
+package handler
 
 type LoginResponse struct {
 	Hp    string `json:"hp"`
