@@ -138,7 +138,7 @@ paths:
             schema:
               $ref: "#/components/schemas/ApiResponse"
             example:
-              kegiatan: "jogging"
+              kegiatan: "Buku GO-lang"
               deskripsi: "Mempelajari dasar-dasar bahasa pemrograman Golang"
       responses:
         "201":
