@@ -1,7 +1,8 @@
 package config
 
 import (
-	"BelajarAPIi/model"
+	todo "clean1/features/todo/data"
+	user "clean1/features/user/data"
 	"fmt"
 	"os"
 
@@ -76,7 +77,7 @@ func InitSQL(c AppConfig) *gorm.DB {
 		return nil
 	}
 
-	db.AutoMigrate(&model.User{}, &model.Activity{}) //Membuat Tabel dari Struct User dan Activity
+	db.AutoMigrate(&user.User{}, &todo.Todo{})
 
 	return db
 }
